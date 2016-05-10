@@ -38,3 +38,16 @@ func TestIOIndex(t *testing.T) {
 	assert.Equal(w.Code, 200)
 	assert.Contains(w.Body.String(), "<iframe src=\"https://events.google.com/io2016/embed\" style=\"width:1000px;height:700px\" frameborder=\"0\" allowfullscreen></iframe>")
 }
+
+func TestNoRoute(t *testing.T){
+  assert := assert.New(t)
+  ts := GetMainEngine()
+
+  req, _ := http.NewRequest("GET", "/noroute", nil)
+  w := httptest.NewRecorder()
+
+  ts.ServeHTTP(w, req)
+
+  assert.Equal(w.Code, 404)
+  assert.Contains(w.Body.String(), "<img src=\"/public/images/fox.jpg\" alt=\"Something to lighten your day\"></img>")
+}

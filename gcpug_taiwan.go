@@ -18,6 +18,10 @@ func ioHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "io.tpl", render.Context{})
 }
 
+func noRouteHandler(c *gin.Context) {
+	c.HTML(http.StatusNotFound, "error.tpl", render.Context{"statusCode":404,"errorMessage":"Page not found"})
+}
+
 func GetMainEngine() *gin.Engine {
 	// check appengine mode
 	s := strings.ToLower(appengine.ServerSoftware())
@@ -33,6 +37,7 @@ func GetMainEngine() *gin.Engine {
 	r.Static("/public", "public")
 	r.GET("/", indexHandler)
 	r.GET("/io2016", ioHandler)
+	r.NoRoute(noRouteHandler)
 
 	return r
 }
