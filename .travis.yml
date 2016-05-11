@@ -21,7 +21,7 @@ before_install:
 - gcloud -q auth activate-service-account --key-file client_secrets.json
 - export GOOGLE_APPLICATION_CREDENTIALS=$TRAVIS_BUILD_DIR/client_secrets.json
 install:
-- go get code.google.com/p/go.tools/cmd/cover
+- go get golang.org/x/tools/cmd/cover
 - go get github.com/mattn/goveralls
 - go get github.com/gin-gonic/gin
 - go get github.com/stretchr/testify/assert
