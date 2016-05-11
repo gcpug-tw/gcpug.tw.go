@@ -1,0 +1,37 @@
+language: go
+go:
+- 1.5.3
+- tip
+cache:
+  directories:
+  - $HOME/gcloud/
+env:
+  matrix:
+  - PATH=$PATH:$HOME/gcloud/google-cloud-sdk/bin GOOGLE_APPLICATION_CREDENTIALS=client_secrets.json PROJECT_ID=gcpug-taiwan
+  global:
+    secure: x0qsV2GbCo9urbLySdvAgymhTZc6HPMxRD47YMTDDQYAxQIFde5pXgzNEVkDyrCTZJ6sAjUP3gi7Gi1Aro+TeWKHoW9y3NVdwfAv2Fbc+Pq0BY7CjKRObI8lyKCvs7M1jg8R2XuZvzc+I7y22MhcokkE/WNtQWCk0PnkqQYdNIzYt1g1UP1zJ5fYFlkxXfth4mZiw8Q7e8sNq6+pmbDILejRvynNZ2YzwdxcGUnmmoiY+InjGCU4lSL2Gz11yPeYOkmd9EdNUHMaMhVcKWe2ZLE03SfftParl2OX29UF36+fcdPuRmz6FgSq2SoHqV/oGfaJJsgdi8zddBStQHwy4MHfABtaN/ujiO8LuFyhFjNR+Ssq83wrJTk4VisMYznXweVDcZjjq/G7JliYSzjGXVXp++9RTYJc2zrcgNGlpL+oZ6NyaYMRF3g4OTt1DWKelUuJrlY0wKv1ajLCwmAD6rI/LIaFN8ZEqtfMlDdUqEm5XAoX8UbmqQLB6w8VdDK72AUvDhFqB531gAJW8DL3r/W5T+Eu6blmV8/5b3k6eXASLACvd+AfdO2uc+vIEln8HAWnqL8XyRdSgE7avV636cOHV8AjZKsy8vKJhwe7QVPl2brIGGC96vKtOeKaK8pQsjtcg+QUQmMmW5loCAjiFBVICSKW9SpW0UONg/ysYGU=
+before_install:
+- openssl aes-256-cbc -K $encrypted_7e9388095561_key -iv $encrypted_7e9388095561_iv
+  -in client_secrets.json.enc -out client_secrets.json -d
+- if [ ! -d $HOME/gcloud/google-cloud-sdk ]; then mkdir -p $HOME/gcloud && wget https://dl.google.com/dl/cloudsdk/release/google-cloud-sdk.tar.gz
+  --directory-prefix=$HOME/gcloud && cd $HOME/gcloud && tar xzf google-cloud-sdk.tar.gz
+  && printf '\ny\n\ny\ny\n' | ./google-cloud-sdk/install.sh && cd $TRAVIS_BUILD_DIR;
+  fi
+- gcloud -q components update
+- gcloud -q auth activate-service-account --key-file client_secrets.json
+- export GOOGLE_APPLICATION_CREDENTIALS=$TRAVIS_BUILD_DIR/client_secrets.json
+install:
+- go get code.google.com/p/go.tools/cmd/cover
+- go get github.com/mattn/goveralls
+- go get github.com/gin-gonic/gin
+- go get github.com/stretchr/testify/assert
+script:
+- go test --bench=".*" -v
+- go test -v -covermode=count -coverprofile=coverage.out
+- $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken
+  $COVERALLS_TOKEN
+# [START deploy]
+# Set the correct project to deploy to
+- gcloud config set project $PROJECT_ID
+- gcloud -q preview app deploy app.yaml --promote
+# [END deploy]
