@@ -28,3 +28,4 @@ _testmain.go
 *.p12
 *.pem
 .tmp
+client_secrets.json

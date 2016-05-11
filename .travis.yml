@@ -24,6 +24,7 @@ install:
 - go get golang.org/x/tools/cmd/cover
 - go get github.com/mattn/goveralls
 - go get github.com/gin-gonic/gin
+- go get github.com/rainbowism/gin-pongo2
 - go get github.com/stretchr/testify/assert
 script:
 - go test --bench=".*" -v
