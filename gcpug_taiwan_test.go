@@ -1,4 +1,4 @@
-package gcpugTaiwan
+package main
 
 import (
 	"net/http"
